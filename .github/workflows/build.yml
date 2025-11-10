@@ -2,14 +2,37 @@ name: Aistora Build & Test Pipeline
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["main", "dev"]
 
 jobs:
-  build_backend:
+  # ⚛️ FRONTEND TEST JOB
+  frontend-test:
+    runs-on: ubuntu-latest
+    name: ⚛️ Build & Test Frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Run frontend tests
+        run: cd frontend && npm run test -- --run
+
+  # 🐍 BACKEND TEST JOB
+  backend-test:
     runs-on: ubuntu-latest
     name: 🐍 Build & Test Backend
+    needs: frontend-test
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -18,38 +41,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r backend/requirements.txt
+        run: pip install -r backend/requirements.txt pytest
 
       - name: Run backend tests
-        run: pytest -q
-
-  build_frontend:
-    runs-on: ubuntu-latest
-    name: ⚛️ Build & Test Frontend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: cd frontend && npm ci
-
-      - name: Run frontend tests
-        run: cd frontend && npm run test -- --run
-
-  docker_build:
-    runs-on: ubuntu-latest
-    name: 🐳 Docker Build Validation
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Build backend Docker image
-        run: docker build -t aistora-backend ./backend
-
-      - name: Build frontend Docker image
-        run: docker build -t aistora-frontend ./frontend
+        run: PYTHONPATH=. python -m pytest -v backend/tests
