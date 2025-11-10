@@ -2,9 +2,9 @@ name: Aistora Build & Test Pipeline
 
 on:
   push:
-    branches: ["main", "dev"]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: ["main", "dev"]
+    branches: [ "main", "dev" ]
 
 jobs:
   # ⚛️ FRONTEND TEST JOB
@@ -45,3 +45,23 @@ jobs:
 
       - name: Run backend tests
         run: PYTHONPATH=. python -m pytest -v backend/tests
+
+  # ⚛️ FRONTEND INTEGRATION TEST JOB
+  frontend-integration:
+    runs-on: ubuntu-latest
+    name: ⚛️ Frontend Integration Test
+    needs: backend-test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Run frontend integration tests
+        run: cd frontend && npm run test -- --run

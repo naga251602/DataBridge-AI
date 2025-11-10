@@ -1,8 +1,19 @@
-import { render, screen } from "@testing-library/react";
-import { expect, test } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import { vi } from "vitest";
 import App from "./App";
 
-test("renders Aistora status", () => {
+vi.stubGlobal(
+  "fetch",
+  vi.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve({ status: "ok" }),
+    })
+  )
+);
+
+test("renders Aistora Frontend Status ok", async () => {
   render(<App />);
-  expect(screen.getByText(/Aistora status/i)).toBeInTheDocument();
+  await waitFor(() =>
+    expect(screen.getByText(/Aistora Frontend Status: ok/i)).toBeInTheDocument()
+  );
 });

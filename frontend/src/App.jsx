@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 
-function App() {
+export default function App() {
   const [status, setStatus] = useState("checking...");
 
   useEffect(() => {
-    fetch(import.meta.env.VITE_API_URL + "/api/health")
-      .then((res) => res.json())
-      .then((data) => setStatus(data.status))
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5001";
+    fetch(`${apiUrl}/api/health`)
+      .then((r) => r.json())
+      .then((data) => setStatus(data.status || "error"))
       .catch(() => setStatus("error"));
   }, []);
 
-  return <h1>Aistora status: {status}</h1>;
+  return (
+    <div className="min-h-screen flex items-center justify-center text-3xl font-bold text-gray-800">
+      Aistora Frontend Status: {status}
+    </div>
+  );
 }
-
-export default App;
