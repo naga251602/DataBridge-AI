@@ -1,11 +1,7 @@
-import React from "react";
-
-function App() {
+export default function App() {
   return (
-    <div style={{ textAlign: "center", marginTop: "20%" }}>
-      <h1>DataBridge AI Frontend Active</h1>
+    <div className="min-h-screen flex items-center justify-center text-3xl font-bold text-gray-800">
+      Aistora Frontend Active
     </div>
   );
 }
-
-export default App;
